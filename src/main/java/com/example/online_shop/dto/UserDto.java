@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserDto {
 
-
     @Schema(description = "Name of the user", example = "John Doe")
     @NotEmpty(message = "Name cannot be null or empty")
     @Size(max = 255, message = "Name must be less than 255 characters")

@@ -81,12 +81,23 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        log.info("Fetching all products from the database");
+        List<Product> products = productRepository.findAll();
+        log.info("Fetched {} products", products.size());
+        return products;
     }
 
     @Override
+    @Transactional
     public void deleteProduct(Long productId) {
+        log.info("Deleting product with ID: {}", productId);
+        if (!productRepository.existsById(productId)) {
+            log.warn("Product with ID {} not found, nothing to delete", productId);
+            return;
+        }
         productRepository.deleteById(productId);
+        log.info("Product with ID {} deleted successfully", productId);
     }
 }

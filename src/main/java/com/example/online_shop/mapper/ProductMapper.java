@@ -5,6 +5,7 @@ import com.example.online_shop.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+
 @Mapper
 public interface ProductMapper {
 
@@ -13,5 +14,4 @@ public interface ProductMapper {
     ProductDto toDto(Product product);
 
     Product toEntity(ProductDto productDto);
-
 }

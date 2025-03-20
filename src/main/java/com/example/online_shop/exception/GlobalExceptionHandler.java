@@ -87,6 +87,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(OrderAlreadyCancelledException.class)
+    public ResponseEntity<ErrorResponseDto> handleOrderAlreadyCancelledException(OrderAlreadyCancelledException exception,
+                                                                             WebRequest webRequest){
+        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+                webRequest.getDescription(false),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponseDto> handleAuthorizationDeniedException(
             AuthorizationDeniedException ex, WebRequest webRequest) {

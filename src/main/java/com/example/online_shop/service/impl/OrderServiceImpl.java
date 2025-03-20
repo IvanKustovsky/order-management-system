@@ -2,13 +2,16 @@ package com.example.online_shop.service.impl;
 
 import com.example.online_shop.dto.CreateOrderRequestDto;
 import com.example.online_shop.dto.OrderItemRequestDto;
+import com.example.online_shop.dto.OrderResponseDto;
 import com.example.online_shop.entity.Order;
 import com.example.online_shop.entity.OrderItem;
 import com.example.online_shop.entity.Product;
 import com.example.online_shop.entity.UserEntity;
 import com.example.online_shop.enums.OrderStatus;
+import com.example.online_shop.exception.OrderAlreadyCancelledException;
 import com.example.online_shop.exception.ProductOutOfStockException;
 import com.example.online_shop.exception.ResourceNotFoundException;
+import com.example.online_shop.mapper.OrderMapper;
 import com.example.online_shop.repository.OrderRepository;
 import com.example.online_shop.repository.ProductRepository;
 import com.example.online_shop.repository.UserRepository;
@@ -33,76 +36,128 @@ public class OrderServiceImpl implements IOrderService {
     private final UserRepository userRepository;
 
     @Override
-    public Order createOrder(CreateOrderRequestDto request) {
+    @Transactional
+    public OrderResponseDto createOrder(CreateOrderRequestDto request) {
         log.info("Creating order for user ID: {}", request.getUserId());
 
-        UserEntity user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id",
-                        String.valueOf(request.getUserId())));
+        UserEntity user = getUserById(request.getUserId());
+        log.info("User found: {}", user.getEmail());
 
-        Order order = Order.builder()
+        Order order = createOrderEntity(user);
+        log.info("Order entity created with status: {}", order.getStatus());
+
+        request.getItems().forEach(itemRequest -> processOrderItem(itemRequest, order));
+
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order successfully saved with ID: {}", savedOrder.getId());
+
+        return OrderMapper.INSTANCE.toOrderResponseDto(savedOrder);
+    }
+
+    private UserEntity getUserById(Long userId) {
+        log.info("Fetching user by ID: {}", userId);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User with ID {} not found", userId);
+                    return new ResourceNotFoundException("User", "Id", String.valueOf(userId));
+                });
+    }
+
+    private Order createOrderEntity(UserEntity user) {
+        return Order.builder()
                 .user(user)
                 .orderDate(LocalDateTime.now())
                 .status(OrderStatus.NEW)
                 .orderItems(new ArrayList<>())
                 .build();
+    }
 
-        for (OrderItemRequestDto itemRequest : request.getItems()) {
-            Product product = productRepository.findById(itemRequest.getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", "Id",
-                            String.valueOf(itemRequest.getProductId())));
+    private void processOrderItem(OrderItemRequestDto itemRequest, Order order) {
+        log.info("Processing order item for product ID: {}", itemRequest.getProductId());
 
-            if (product.getStockQuantity() < itemRequest.getQuantity()) {
-                throw new ProductOutOfStockException(
-                        product.getName(),
-                        product.getStockQuantity(),
-                        itemRequest.getQuantity()
-                );
-            }
+        Product product = productRepository.findById(itemRequest.getProductId())
+                .orElseThrow(() -> {
+                    log.error("Product with ID {} not found", itemRequest.getProductId());
+                    return new ResourceNotFoundException("Product", "Id", String.valueOf(itemRequest.getProductId()));
+                });
 
-            product.setStockQuantity(product.getStockQuantity() - itemRequest.getQuantity());
-            productRepository.save(product); // update stock
-
-            OrderItem orderItem = OrderItem.builder()
-                    .order(order)
-                    .product(product)
-                    .quantity(itemRequest.getQuantity())
-                    .build();
-
-            order.getOrderItems().add(orderItem);
+        if (product.getStockQuantity() < itemRequest.getQuantity()) {
+            log.error("Product '{}' is out of stock. Available: {}, Requested: {}",
+                    product.getName(), product.getStockQuantity(), itemRequest.getQuantity());
+            throw new ProductOutOfStockException(
+                    product.getName(), product.getStockQuantity(), itemRequest.getQuantity()
+            );
         }
 
-        return orderRepository.save(order);
+        product.setStockQuantity(product.getStockQuantity() - itemRequest.getQuantity());
+        productRepository.save(product);
+        log.info("Stock updated for product '{}'. New quantity: {}", product.getName(), product.getStockQuantity());
+
+        OrderItem orderItem = OrderItem.builder()
+                .order(order)
+                .product(product)
+                .quantity(itemRequest.getQuantity())
+                .build();
+
+        order.getOrderItems().add(orderItem);
+        log.info("Added order item: Product ID: {}, Quantity: {}", product.getId(), itemRequest.getQuantity());
     }
 
     @Override
-    public Order getOrderById(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "Id", String.valueOf(orderId)));
+    @Transactional(readOnly = true)
+    public OrderResponseDto getOrderById(Long orderId) {
+        log.info("Fetching order by ID: {}", orderId);
+        var order = orderRepository.findById(orderId)
+                .orElseThrow(() -> {
+                    log.error("Order with ID {} not found", orderId);
+                    return new ResourceNotFoundException("Order", "Id", String.valueOf(orderId));
+                });
+        return OrderMapper.INSTANCE.toOrderResponseDto(order);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getOrdersByUserId(Long userId) {
+        log.info("Fetching orders for user ID: {}", userId);
+        List<Order> orders = orderRepository.findAllByUserId(userId);
+
+        if (orders.isEmpty()) {
+            log.warn("No orders found for user ID: {}", userId);
+            throw new ResourceNotFoundException("Orders", "UserId", String.valueOf(userId));
+        }
+
+        return orders.stream()
+                .map(OrderMapper.INSTANCE::toOrderResponseDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional
     public void cancelOrder(Long orderId) {
-        Order order = getOrderById(orderId);
+        log.info("Cancelling order with ID: {}", orderId);
+        var order = orderRepository.findById(orderId)
+                .orElseThrow(() -> {
+                    log.error("Order with ID {} not found", orderId);
+                    return new ResourceNotFoundException("Order", "Id", String.valueOf(orderId));
+                });
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("Order is already cancelled");
+            log.warn("Order with ID {} is already cancelled", orderId);
+            throw new OrderAlreadyCancelledException();
         }
 
         order.setStatus(OrderStatus.CANCELLED);
+        log.info("Order status updated to CANCELLED for order ID: {}", orderId);
 
-        // Повертаємо товари на склад
+        // Restore stock for cancelled order
         for (OrderItem item : order.getOrderItems()) {
             Product product = item.getProduct();
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
             productRepository.save(product);
+            log.info("Restored stock for product '{}'. New quantity: {}", product.getName(), product.getStockQuantity());
         }
 
         orderRepository.save(order);
-    }
-
-    @Override
-    public List<Order> getOrdersByUserId(Long userId) {
-        return orderRepository.findAllByUserId(userId);
+        log.info("Order with ID {} successfully cancelled", orderId);
     }
 }

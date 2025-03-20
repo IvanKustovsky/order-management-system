@@ -1,0 +1,396 @@
+{
+	"info": {
+		"_postman_id": "cb2c82f1-7528-46d2-af77-531f30fcc1d8",
+		"name": "Online Shop Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33041261"
+	},
+	"item": [
+		{
+			"name": "Register User",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Ivan Kustovsky\",\r\n    \"email\": \"vankust1221@gmail.com\",\r\n    \"mobileNumber\": \"+380965843711\",\r\n    \"password\" : \"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/api/v1/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"api",
+						"v1",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login User",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"vankust122999@gmail.com\",\r\n    \"password\" : \"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/api/v1/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout User",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/api/v1/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"api",
+						"v1",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch User",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "vankust1223@gmail.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/api/v1?email=vankust1216@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"api",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "vankust1216@gmail.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "vankust1225@gmail.com",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/api/v1?email=vankust1221@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"api",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "vankust1221@gmail.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Product",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "productDto",
+							"value": "{\n    \"name\": \"Gaming Chair\",\n    \"description\": \"Comfortable ergonomic gaming chair with adjustable armrests\",\n    \"price\": \"129.99\",\n    \"stockQuantity\": \"15\"\n  }",
+							"contentType": "application/json",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/C:/Users/user/Desktop/laptop.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/products/api/v1/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"api",
+						"v1",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/products/api/v1/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"api",
+						"v1",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Product",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkSmZvSG0yYmZEYklrZVFwalp3WmZQNTBQUHVXYl9KWm5hNjlhUy1RU0FNIn0.eyJleHAiOjE3Mzc0NDk5MjQsImlhdCI6MTczNzQ0OTYyNCwianRpIjoiMjcxOGE0NDMtZjgyMC00MjgzLThkZmMtZGJjZDU3OWM0MThlIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDIwL3JlYWxtcy9lMnJlbnRfZGV2IiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImQ1ODc1NTI3LWNlNWUtNGY1Ny1hOTFhLThhNGE0NDQ3MzcyMSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImUycmVudC1kZXYta2V5Y2xvYWsiLCJzaWQiOiI1M2U0NWFlNi1hOTRhLTRkZjEtYjE1YS1kMWJiOWJkMmQ2MmQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIi8qIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLWUycmVudF9kZXYiLCJvZmZsaW5lX2FjY2VzcyIsIkFETUlOIiwidW1hX2F1dGhvcml6YXRpb24iLCJVU0VSIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJBZG1pbiBBZG1pbiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluMTIzQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBZG1pbiIsImZhbWlseV9uYW1lIjoiQWRtaW4iLCJlbWFpbCI6ImFkbWluMTIzQGdtYWlsLmNvbSJ9.ugRXSIDGRR2C2otIpl6XfCykJ5POIpwBhSGIZk0QZP3BwLsIZlTSamHJhGo_B8qDp6IrmLjKzDNniu4VO-PnjecBjXuKvJ0ulFTxnKF5Tjz2snxf4Oenw7Nq11OzfkYSXiRExBt12eNycn0zcybkZoDbLg1RWLA_2ncWm7P0BCn1LPIUlPKNjUnNGdzhK1L-EATHaN_f6kssWbfHticngvLjEumtY7e-rU_d1hY9kvVKgZETxeTfpcQ3IB8FJ98q8lUC-9FtuykZaQfz5Wo6Guu_xkevOxB2jKCRorlk25BJhvbLjJ5AOMxIzuSDkwqJO7ErLFEQu3DG9bEyupuw7A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/products/api/v1/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"api",
+						"v1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": 1,\r\n  \"items\": [\r\n    {\r\n      \"productId\": 3,\r\n      \"quantity\": 2\r\n    },\r\n    {\r\n      \"productId\": 4,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/orders/api/v1/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"api",
+						"v1",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Order By ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/orders/api/v1/12",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"api",
+						"v1",
+						"12"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Orders By User ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/orders/api/v1/user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"api",
+						"v1",
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Order",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Ivan Kustovsky\",\r\n    \"email\": \"vankust1216@gmail.com\",\r\n    \"mobileNumber\": \"+380965843711\",\r\n    \"password\" : \"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/orders/api/v1/1/cancel",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"api",
+						"v1",
+						"1",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
